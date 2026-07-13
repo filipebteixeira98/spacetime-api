@@ -43,6 +43,10 @@ pids/
 # TypeScript
 *.tsbuildinfo
 
+# Database
+*.db
+*.db-journal
+
 # OS and editor files
 .DS_Store
 Thumbs.db
