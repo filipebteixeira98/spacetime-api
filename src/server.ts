@@ -1,10 +1,14 @@
 import fastify from 'fastify'
 
+import { memoriesRoutes } from './routes/memories'
+
 const app = fastify()
 
 app.get('/health', () => {
   return 'OK'
 })
+
+app.register(memoriesRoutes)
 
 app.listen({ port: 3333 }).then(() => {
   console.log('🚀 Back-end is running at http://localhost:3333/')
