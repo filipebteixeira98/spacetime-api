@@ -1,6 +1,7 @@
 import 'dotenv/config'
 
 import cors from '@fastify/cors'
+import jwt from '@fastify/jwt'
 import fastify from 'fastify'
 
 import { authRoutes } from './routes/auth'
@@ -10,6 +11,10 @@ const app = fastify()
 
 app.register(cors, {
   origin: true,
+})
+
+app.register(jwt, {
+  secret: '568a3c265f1d51ccd01fd1ac212f8bbb',
 })
 
 app.get('/health', () => {
