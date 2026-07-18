@@ -1,31 +1,52 @@
-import axios from 'axios'
+import axios, { type AxiosResponse } from 'axios'
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 
 import { prisma } from '../lib/prisma'
 
+interface GithubAccessTokenResponse {
+  access_token: string
+}
+
 export async function authRoutes(app: FastifyInstance) {
-  app.post('/register', async (request) => {
+  app.post('/register', async (request, reply) => {
     const bodySchema = z.object({
       code: z.string(),
+      codeVerifier: z.string(),
+      redirectUri: z.string().url(),
     })
 
-    const { code } = bodySchema.parse(request.body)
+    const { code, codeVerifier, redirectUri } = bodySchema.parse(request.body)
 
-    const accessTokenResponse = await axios.post(
-      'https://github.com/login/oauth/access_token',
-      null,
-      {
-        params: {
-          client_id: process.env.GITHUB_CLIENT_ID,
-          client_secret: process.env.GITHUB_CLIENT_SECRET,
-          code,
+    let accessTokenResponse: AxiosResponse<GithubAccessTokenResponse>
+
+    try {
+      accessTokenResponse = await axios.post<GithubAccessTokenResponse>(
+        'https://github.com/login/oauth/access_token',
+        null,
+        {
+          params: {
+            client_id: process.env.GITHUB_CLIENT_ID,
+            client_secret: process.env.GITHUB_CLIENT_SECRET,
+            code,
+            code_verifier: codeVerifier,
+            redirect_uri: redirectUri,
+          },
+          headers: {
+            Accept: 'application/json',
+          },
         },
-        headers: {
-          Accept: 'application/json',
-        },
-      },
-    )
+      )
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return reply.status(400).send({
+          message: 'GitHub token exchange failed',
+          github: error.response?.data,
+        })
+      }
+
+      throw error
+    }
 
     const { access_token } = accessTokenResponse.data
 
