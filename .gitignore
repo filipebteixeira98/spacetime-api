@@ -47,6 +47,10 @@ pids/
 *.db
 *.db-journal
 
+# Uploaded files
+uploads/*
+!uploads/.gitkeep
+
 # OS and editor files
 .DS_Store
 Thumbs.db
