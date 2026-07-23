@@ -10,6 +10,7 @@ import fastify from 'fastify'
 
 import { authRoutes } from './routes/auth'
 import { memoriesRoutes } from './routes/memories'
+import { uploadRoutes } from './routes/upload'
 
 const app = fastify()
 
@@ -33,6 +34,7 @@ app.get('/health', () => {
 })
 
 app.register(authRoutes)
+app.register(uploadRoutes)
 app.register(memoriesRoutes)
 
 app.listen({ port: 3333, host: '0.0.0.0' }).then(() => {
